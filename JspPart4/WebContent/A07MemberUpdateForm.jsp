@@ -34,6 +34,11 @@
 	
 	String pass = mdao.getPass(mbean.getId());
 	
+	//사용자가 패스워드르 입력하지 않아 null로 값이 넘어오는 경우 ""로 다시 저장
+	if(mbean.getPass1() == null){
+		mbean.setPass1("");
+	}
+	
 	if(mbean.getPass1().equals(pass)){
 		mdao.updateMember(mbean);
 		
