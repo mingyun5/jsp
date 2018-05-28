@@ -1,3 +1,4 @@
+<%@page import="model.MemberDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -27,5 +28,24 @@
 %>
 
 <!-- 사용자가 수정한 내역을 테이블에 업데이트 -->
+
+<%
+	MemberDao mdao = new MemberDao();
+	
+	String pass = mdao.getPass(mbean.getId());
+	
+	if(mbean.getPass1().equals(pass)){
+		mdao.updateMember(mbean);
+		
+		response.sendRedirect("A04MemberList.jsp");
+	}else{
+		%>
+		<script>
+			alert("비밀번호가 일치하지 않습니다.");
+			history.go(-1);
+		</script>	
+		<%
+	}
+%>
 </body>
 </html>
