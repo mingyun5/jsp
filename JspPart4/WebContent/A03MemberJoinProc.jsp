@@ -42,17 +42,13 @@
 		history.go(-1);
 	</script>
 	<%
+		} else {
+			/* <!-- 4. 오라클에 데이서 insert 처리 --> */
+			MemberDao mdao = new MemberDao();
+			mdao.insertMember(mbean);
+
+			response.sendRedirect("A04MemberList.jsp");
 		}
 	%>
-
-	<!-- 4. 오라클에 데이서 insert 처리 -->
-
-	<%
-		MemberDao mdao = new MemberDao();
-		mdao.insertMember(mbean);
-
-		response.sendRedirect("A04MemberList.jsp");
-	%>
-
 </body>
 </html>

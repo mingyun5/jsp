@@ -70,7 +70,7 @@
 			<tr>
 				<td colspan="2" class="end">
 					<button onclick="location.href='A06MemberUpdateForm.jsp?id=<%= mbean.getId()%>'">회원정보 수정</button>
-					<button>회원정보 삭제</button>
+					<button onclick="location.href='A8MemberDeleteForm.jsp?id=<%= mbean.getId()%>'">회원정보 삭제</button>
 					<button onclick="location.href='A04MemberList.jsp'">회원전체 보기</button>
 					<button onclick="location.href='A01MemberJoin.jsp'">회원정보 입력</button>
 				</td>

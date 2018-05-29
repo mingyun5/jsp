@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -125,7 +126,7 @@ public class MemberDao {
 				bean.setAge(rs.getString(7));
 				bean.setInfo(rs.getString(8));
 			}
-			
+
 			rs.close();
 			ps.close();
 			conn.close();
@@ -135,44 +136,44 @@ public class MemberDao {
 
 		return bean;
 	}
-	
-//	5.회원 한명의 비밀번호를 조회하여 리턴하는 메서드
+
+	// 5.회원 한명의 비밀번호를 조회하여 리턴하는 메서드
 	public String getPass(String id) {
-		
+
 		String pass = "";
-		
+
 		try {
 			getCon();
-			
+
 			String sql = "select pass1 from member where id = ?";
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, id);
-			
+
 			rs = ps.executeQuery();
-			
-			if(rs.next()) {
+
+			if (rs.next()) {
 				pass = rs.getString(1);
 			}
 			rs.close();
 			ps.close();
 			conn.close();
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return pass;
 	}
-	
-	//6. 테이블에 한명의횐원 정보를 업데이트 하는 메소드
-	
+
+	// 6. 테이블에 한명의횐원 정보를 업데이트 하는 메소드
+
 	public void updateMember(MemberBean bean) {
 		try {
 			getCon();
-			
+
 			String sql = "update member set email=?, tel=?, hobby=?, job=?, age=?, info=? where id = ?";
-			
+
 			ps = conn.prepareStatement(sql);
-			
+
 			ps.setString(1, bean.getEmail());
 			ps.setString(2, bean.getTel());
 			ps.setString(3, bean.getHobby());
@@ -180,14 +181,35 @@ public class MemberDao {
 			ps.setString(5, bean.getAge());
 			ps.setString(6, bean.getInfo());
 			ps.setString(7, bean.getId());
+
+			ps.executeUpdate();
+
+			ps.close();
+			conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void deleteMember(String id) {
+
+		try {
+			getCon();
+
+			String sql = "delete from member where id = ?";
+
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, id);
 			
 			ps.executeUpdate();
 			
 			ps.close();
+			
 			conn.close();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 }
