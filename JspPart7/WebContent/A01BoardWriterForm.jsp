@@ -52,7 +52,7 @@
 				<tr>
 					<th class="subName">내용</th>
 					<td>
-						<textarea rows="10" cols="50" name="content"></textarea>
+						<textarea rows="10" cols="50" name="content" class="control"></textarea>
 					</td>
 				</tr>
 			</tbody>
