@@ -9,6 +9,21 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
+<style>
+	body{font-family:"돋움"}
+	h2{text-align:center}
+	table{width:700px; margin: 0 auto;}
+	table, tr, th, td{border: 1px solid #000; border-collapse:collapse}
+	#num{padding: 10px 0; width: 50px;}
+	#subject{padding: 10px 0; width: 320px;}
+	#writer{padding: 10px 0; width: 100px;}
+	#reg_date{padding: 10px 0 ; width: 150px;}
+	#readcount{padding: 10px 0; width: 80px;}
+	.st1{padding: 5px 0; text-align: center;}
+	.st2{padding: 5px ; text-align: left}
+	.end{text-align: center; padding: 10px 5px;}
+	a {text-decoration: none}
+</style>
 <body>
 <%
 	BoardDAO dao = new BoardDAO();
@@ -41,15 +56,27 @@
 						<%=bean.getSubject() %>
 					</a>
 				</td>
-				<td class="st3"></td>
-				<td></td>
-				<td></td>
+				<td class="st1">
+					<%=bean.getWriter() %>
+				</td>
+				<td class="st1">
+					<%=bean.getReg_date() %>
+				</td>
+				<td class="st1">
+					<%=bean.getReadcount() %>
+				</td>
 			</tr>
 		<%
 			}
 		%>
 		</tbody>
-		<tfoot></tfoot>
+		<tfoot>
+			<tr>
+				<td colspan="5" class="end">
+					<button onclick="location.href='A01BoardWriterForm.jsp'">글 쓰기</button>
+				</td>
+			</tr>
+		</tfoot>
 	</table>
 </body>
 </html>
