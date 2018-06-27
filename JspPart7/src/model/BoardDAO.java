@@ -91,7 +91,8 @@ public class BoardDAO {
 				bean.setRef(rs.getInt(7));
 				bean.setRe_step(rs.getInt(8));
 				bean.setRe_level(rs.getInt(9));
-				bean.setContent(rs.getString(10));
+				bean.setReadcount(rs.getInt(10));
+				bean.setContent(rs.getString(11));
 				
 				vec.add(bean);
 			}
@@ -113,7 +114,7 @@ public class BoardDAO {
 		getCon();
 		try {
 			//조회수 증가
-			String readsql = "update board set readcount = readcount + 1 where num = ?";
+			String readsql = "update board set READCOUNT = READCOUNT + 1 where num = ?";
 			ps = conn.prepareStatement(readsql);
 			ps.setInt(1, num);
 			ps.executeUpdate();
@@ -133,7 +134,8 @@ public class BoardDAO {
 				bean.setRef(rs.getInt(7));
 				bean.setRe_step(rs.getInt(8));
 				bean.setRe_level(rs.getInt(9));
-				bean.setContent(rs.getString(10));
+				bean.setReadcount(rs.getInt(10));
+				bean.setContent(rs.getString(11));
 			}
 			
 		} catch (Exception e) {
