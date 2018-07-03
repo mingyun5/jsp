@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>C01BoardInfo</title>
+<title>E01BoardUpdateForm</title>
 <style type="text/css">
 	body {
 		font-family: "돋움";
@@ -22,13 +22,16 @@
 		padding: 10px;
 	}
 	.subName {
-		width: 100px;
+		width: 110px;
 		padding: 5px;
 	}
 	.st1 {
-		width: 200px;
+		width: 150px;
 		padding: 5px;
 		text-align: center;
+	}
+	.control {
+		width: 450px;
 	}
 	.end {
 		padding: 5px;
@@ -40,23 +43,19 @@
 <%
 	int num = Integer.parseInt(request.getParameter("num").trim());
 
+	// 조회수 증가 없이 하나의 게시글을 리턴받음
 	BoardDAO bdao = new BoardDAO();
-	BoardBean bean = bdao.getOneBoard(num);
+	BoardBean bean = bdao.getOneUpdateBoard(num);
 %>
 
+<form action="E02BoardUpdateProc.jsp" method="post">
 <table>
 	<thead>
 		<tr>
-			<th colspan="4" class="mainName">글상세</th>
+			<th class="mainName" colspan="4">글수정</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			<th class="subName">글번호</th>
-			<td class="st1"><%=bean.getNum() %></td>
-			<th class="subName">조회수</th>
-			<td class="st1"><%=bean.getReadcount() %></td>
-		</tr>
 		<tr>
 			<th class="subName">작성자</th>
 			<td class="st1"><%=bean.getWriter() %></td>
@@ -64,29 +63,53 @@
 			<td class="st1"><%=bean.getReg_date() %></td>
 		</tr>
 		<tr>
-			<th class="subName">이메일</th>
-			<td colspan="3"><%=bean.getEmail() %></td>
+			<th class="subName">제목</th>
+			<td colspan="3">
+				<input type="text" name="subject" value="<%=bean.getSubject() %>" class="control">
+			</td>
 		</tr>
 		<tr>
-			<th class="subName">제목</th>
-			<td colspan="3"><%=bean.getSubject() %></td>
+			<th class="subName">비밀번호</th>
+			<td colspan="3">
+				<input type="password" name="password" class="control">
+			</td>
 		</tr>
 		<tr>
 			<th class="subName">글내용</th>
-			<td colspan="3"><%=bean.getContent() %></td>
+			<td colspan="3">
+				<textarea rows="10" cols="50" name="content" class="control"><%=bean.getContent() %></textarea>
+			</td>
 		</tr>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="4" class="end">
-				<button onclick="location.href='D01BoardReWriteForm.jsp?num=<%=bean.getNum() %>&ref=<%=bean.getRef() %>&re_step=<%=bean.getRe_step() %>&re_level=<%=bean.getRe_level() %>'">답글쓰기</button>
-				<button onclick="location.href='E01BoardUpdateForm.jsp?num=<%=bean.getNum() %>'">수정하기</button>
-				<button onclick="location.href='F01BoardDeleteForm.jsp?num=<%=bean.getNum() %>'">삭제하기</button>
-				<button onclick="location.href='B01BoardList.jsp'">목록보기</button>
+			<td class="end" colspan="4">
+				<input type="hidden" name="num" value="<%=bean.getNum() %>">
+				<input type="submit" value="글수정">&nbsp;&nbsp;
+				<input type="reset" value="다시작성">&nbsp;&nbsp;
+				<button type="button" onclick="location.href='B01BoardList.jsp'">글목록보기</button>
 			</td>
 		</tr>
 	</tfoot>
 </table>
+</form>
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

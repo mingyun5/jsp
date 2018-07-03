@@ -3,7 +3,6 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Vector;
 
 import javax.naming.Context;
@@ -12,76 +11,76 @@ import javax.sql.DataSource;
 
 public class BoardDAO {
 
-	Connection conn;
-	PreparedStatement ps;
+	Connection con;
+	PreparedStatement pstmt;
 	ResultSet rs;
-
+	
 	public void getCon() {
 		try {
 			Context initctx = new InitialContext();
 			Context envctx = (Context) initctx.lookup("java:comp/env");
 			DataSource ds = (DataSource) envctx.lookup("jdbc/pool");
-			conn = ds.getConnection();
+			con = ds.getConnection();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	// ê¸€ì“°ê¸°
+	
+	// ±Û¾²±â
 	public void insertBoard(BoardBean bean) {
 		getCon();
-
+		
 		int ref = 0;
 		int re_step = 1;
 		int re_level = 1;
-
+		
 		try {
 			String refsql = "select NVL(max(ref),0) from board";
-			ps = conn.prepareStatement(refsql);
-			rs = ps.executeQuery();
+			pstmt = con.prepareStatement(refsql);
+			rs = pstmt.executeQuery();
 			
 			if(rs.next()) {
-				ref = rs.getInt(1) + 1; // ê¸€ê·¸ë£¹ ìµœëŒ€ê°’ +1
+				ref = rs.getInt(1) + 1;	// »õ±Û¾²±â : ±Û±×·ì ÃÖ´ë°ª + 1
 			}
 			
-			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,SYSDATE,?,?,?,0,?)";
+			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,SYSDATE,?,?,?,0,?,'N')";
 			
-			ps = conn.prepareStatement(sql);
+			pstmt = con.prepareStatement(sql);
 			
-			ps.setString(1, bean.getWriter());
-			ps.setString(2, bean.getEmail());
-			ps.setString(3, bean.getSubject());
-			ps.setString(4, bean.getPassword());
-			ps.setInt(5, ref);
-			ps.setInt(6, re_step);
-			ps.setInt(7, re_level);
-			ps.setString(8, bean.getContent());
+			pstmt.setString(1, bean.getWriter());
+			pstmt.setString(2, bean.getEmail());
+			pstmt.setString(3, bean.getSubject());
+			pstmt.setString(4, bean.getPassword());
+			pstmt.setInt(5, ref);
+			pstmt.setInt(6, re_step);
+			pstmt.setInt(7, re_level);
+			pstmt.setString(8, bean.getContent());
 			
-			ps.executeUpdate();
+			pstmt.executeUpdate();
 			
+			pstmt.close();
 			rs.close();
-			ps.close();
-			conn.close();
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			con.close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-// ì „ì²´ê¸€ ì¡°íšŒ
-	public Vector<BoardBean> getAllBoard(){
+	// ÀüÃ¼±Û Á¶È¸
+	public Vector<BoardBean> getAllBoard() {
 		Vector<BoardBean> vec = new Vector<>();
+		
 		getCon();
 		
 		try {
-			String sql = "select * from board order by ref desc, re_level ASC";
+			String sql = "select * from board order by ref DESC, re_level ASC";
 			
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
+			pstmt = con.prepareStatement(sql);
+			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
 				BoardBean bean = new BoardBean();
+				
 				bean.setNum(rs.getInt(1));
 				bean.setWriter(rs.getString(2));
 				bean.setEmail(rs.getString(3));
@@ -93,14 +92,14 @@ public class BoardDAO {
 				bean.setRe_level(rs.getInt(9));
 				bean.setReadcount(rs.getInt(10));
 				bean.setContent(rs.getString(11));
+				bean.setDel_flag(rs.getString(12));
 				
 				vec.add(bean);
 			}
 			
+			pstmt.close();
 			rs.close();
-			ps.close();
-			conn.close();
-			
+			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -108,21 +107,23 @@ public class BoardDAO {
 		return vec;
 	}
 	
-	//ê²Œì‹œê¸€ ì¡°íšŒ
+	// Á¶È¸¼ö¸¦ Áõ°¡ÇÏ¸é¼­ ÇÏ³ªÀÇ °Ô½Ã±ÛÀ» ¸®ÅÏ
 	public BoardBean getOneBoard(int num) {
 		BoardBean bean = new BoardBean();
+		
 		getCon();
+		
 		try {
-			//ì¡°íšŒìˆ˜ ì¦ê°€
-			String readsql = "update board set READCOUNT = READCOUNT + 1 where num = ?";
-			ps = conn.prepareStatement(readsql);
-			ps.setInt(1, num);
-			ps.executeUpdate();
+			// Á¶È¸¼ö Áõ°¡
+			String readsql = "update board set readcount = readcount + 1 where num = ?";
+			pstmt = con.prepareStatement(readsql);
+			pstmt.setInt(1, num);
+			pstmt.executeUpdate();
 			
 			String sql = "select * from board where num = ?";
-			ps = conn.prepareStatement(sql);
-			ps.setInt(1, num);
-			rs = ps.executeQuery();
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			rs = pstmt.executeQuery();
 			
 			if(rs.next()) {
 				bean.setNum(rs.getInt(1));
@@ -138,9 +139,178 @@ public class BoardDAO {
 				bean.setContent(rs.getString(11));
 			}
 			
+			pstmt.close();
+			rs.close();
+			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return bean;
 	}
+	
+	// ´ä±ÛÀúÀå
+	public void ReWriteBoard(BoardBean bean) {
+		int ref = bean.getRef();
+		int re_step = bean.getRe_step();
+		int re_level = bean.getRe_level();
+		
+		getCon();
+		
+		try {
+			// 1. ºÎ¸ð±Û°ú °°Àº ±×·ìÀÇ ±ÛÀ» ´ë»óÀ¸·Î -> ºÎ¸ð±Ûº¸´Ù Å« re_levelÀÇ °ªÀ» ¸ðµÎ 1¾¿ Áõ°¡
+			String levelsql = "update board set re_level = re_level + 1 where ref = ? and re_level > ?";
+			
+			pstmt = con.prepareStatement(levelsql);
+			pstmt.setInt(1, ref);
+			pstmt.setInt(2, re_level);
+			pstmt.executeUpdate();
+			
+			// 2. ´ä±Û ÀúÀå
+			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,sysdate,?,?,?,0,?,'N')";
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getWriter());
+			pstmt.setString(2, bean.getEmail());
+			pstmt.setString(3, bean.getSubject());
+			pstmt.setString(4, bean.getPassword());
+			pstmt.setInt(5, ref);
+			pstmt.setInt(6, re_step + 1);
+			pstmt.setInt(7, re_level + 1);
+			pstmt.setString(8, bean.getContent());
+			
+			pstmt.executeUpdate();
+			
+			pstmt.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Á¶È¸¼ö Áõ°¡¾øÀÌ ÇÏ³ªÀÇ °Ô½Ã±ÛÀ» ¸®ÅÏ
+	public BoardBean getOneUpdateBoard(int num) {
+		BoardBean bean = new BoardBean();
+		
+		getCon();
+		
+		try {
+			String sql = "select * from board where num = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				bean.setNum(rs.getInt(1));
+				bean.setWriter(rs.getString(2));
+				bean.setEmail(rs.getString(3));
+				bean.setSubject(rs.getString(4));
+				bean.setPassword(rs.getString(5));
+				bean.setReg_date(rs.getDate(6).toString());
+				bean.setRef(rs.getInt(7));
+				bean.setRe_step(rs.getInt(8));
+				bean.setRe_level(rs.getInt(9));
+				bean.setReadcount(rs.getInt(10));
+				bean.setContent(rs.getString(11));
+			}
+			
+			pstmt.close();
+			rs.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return bean;
+	}
+	
+	// ÇØ´ç °Ô½Ã±ÛÀÇ ºñ¹Ð¹øÈ£¸¦ ¸®ÅÏ
+	public String getPass(int num) {
+		String pass = "";
+		
+		getCon();
+		
+		try {
+			/*String sql = "select password from board where num = ?";*/
+			String sql = "update board set del_flag = 'Y' where num = ?"; //±Û »èÁ¦½Ã ¾÷µ¥ÀÌÆ®·Î Ã³¸®
+						
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				pass = rs.getString(1);
+			}
+			
+			pstmt.close();
+			rs.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return pass;
+	}
+	
+	// ÇØ´ç °Ô½Ã±Û ÇÑ°³¸¦ ¼öÁ¤
+	public void updateBoard(BoardBean bean) {
+		getCon();
+		
+		try {
+			String sql = "update board set subject = ?, content = ? where num = ?";
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getSubject());
+			pstmt.setString(2, bean.getContent());
+			pstmt.setInt(3, bean.getNum());
+			
+			pstmt.executeUpdate();
+			
+			pstmt.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//ÇØ´ç °Ô½Ã±Û ÇÑ°³¸¦ »èÁ¦
+	public void deleteBoard(int num) {
+		getCon();
+		
+		try {
+			String sql = "delete from board where num = ?";
+			
+			//Äõ¸® ½ÇÇà°´Ã¼ ¼±¾ð ¹× ¼ÂÆÃ
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			//Äõ¸® ½ÇÇà
+			pstmt.executeUpdate();
+			//ÀÚ¿ø¹Ý³³
+			pstmt.close();
+			con.close();
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
