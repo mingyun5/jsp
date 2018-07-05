@@ -12,7 +12,7 @@ public class BoardBean {
 	private int re_level;
 	private int readcount;
 	private String content;
-	private String del_flag;
+	private String del_flag;	// 昏力咯何
 	
 	public int getNum() {
 		return num;
@@ -80,11 +80,11 @@ public class BoardBean {
 	public void setContent(String content) {
 		this.content = content;
 	}
+	// 昏力咯何
 	public String getDel_flag() {
 		return del_flag;
 	}
 	public void setDel_flag(String del_flag) {
 		this.del_flag = del_flag;
 	}
-	
 }

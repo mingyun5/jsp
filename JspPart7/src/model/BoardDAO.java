@@ -43,7 +43,7 @@ public class BoardDAO {
 				ref = rs.getInt(1) + 1;	// 새글쓰기 : 글그룹 최대값 + 1
 			}
 			
-			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,SYSDATE,?,?,?,0,?,'N')";
+			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,SYSDATE,?,?,?,0,?,'N')";	// 마지막 'N' : 삭제여부
 			
 			pstmt = con.prepareStatement(sql);
 			
@@ -92,7 +92,52 @@ public class BoardDAO {
 				bean.setRe_level(rs.getInt(9));
 				bean.setReadcount(rs.getInt(10));
 				bean.setContent(rs.getString(11));
-				bean.setDel_flag(rs.getString(12));
+				bean.setDel_flag(rs.getString(12));	// 삭제여부
+				
+				vec.add(bean);
+			}
+			
+			pstmt.close();
+			rs.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return vec;
+	}
+	
+	// 전체글 조회
+	public Vector<BoardBean> getAllBoard(int start, int end) {
+		Vector<BoardBean> vec = new Vector<>();
+		
+		getCon();
+		
+		try {
+			String sql = "select * from (select a.*, ROWNUM AS rnum from (select * from board order by ref DESC, re_level ASC) a) "
+					+	 "where rnum between ? and ?";
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, start);
+			pstmt.setInt(2, end);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				BoardBean bean = new BoardBean();
+				
+				bean.setNum(rs.getInt(1));
+				bean.setWriter(rs.getString(2));
+				bean.setEmail(rs.getString(3));
+				bean.setSubject(rs.getString(4));
+				bean.setPassword(rs.getString(5));
+				bean.setReg_date(rs.getDate(6).toString());
+				bean.setRef(rs.getInt(7));
+				bean.setRe_step(rs.getInt(8));
+				bean.setRe_level(rs.getInt(9));
+				bean.setReadcount(rs.getInt(10));
+				bean.setContent(rs.getString(11));
+				bean.setDel_flag(rs.getString(12));	// 삭제여부
 				
 				vec.add(bean);
 			}
@@ -167,7 +212,7 @@ public class BoardDAO {
 			pstmt.executeUpdate();
 			
 			// 2. 답글 저장
-			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,sysdate,?,?,?,0,?,'N')";
+			String sql = "insert into board values(board_seq.NEXTVAL,?,?,?,?,sysdate,?,?,?,0,?,'N')"; // 마지막 'N' : 삭제여부
 			
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, bean.getWriter());
@@ -231,9 +276,8 @@ public class BoardDAO {
 		getCon();
 		
 		try {
-			/*String sql = "select password from board where num = ?";*/
-			String sql = "update board set del_flag = 'Y' where num = ?"; //글 삭제시 업데이트로 처리
-						
+			String sql = "select password from board where num = ?";
+			
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, num);
 			
@@ -274,27 +318,57 @@ public class BoardDAO {
 		}
 	}
 	
-	//해당 게시글 한개를 삭제
+	// 해당 게시글 한개를 삭제
 	public void deleteBoard(int num) {
 		getCon();
 		
 		try {
-			String sql = "delete from board where num = ?";
+			// 쿼리준비
+			// String sql = "delete from board where num = ?";
+			String sql = "update board set del_flag = 'Y' where num = ?"; // 글 삭제시 업데이트로 처리
 			
-			//쿼리 실행객체 선언 및 셋팅
+			// 쿼리실행객체 선언 및 셋팅
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, num);
-			//쿼리 실행
+			
+			// 쿼리실행
 			pstmt.executeUpdate();
-			//자원반납
+			
+			// 자원반납
 			pstmt.close();
 			con.close();
-			
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	// 전체글의 개수를 리턴
+	public int getAllCount() {
+		int count = 0;
+		
+		getCon();
+		
+		try {
+			String sql = "select count(*) from board";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				count = rs.getInt(1);	// 전체 게시글의 개수
+			}
+			
+			pstmt.close();
+			rs.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return count;
+	}
+	
 }
 
 
